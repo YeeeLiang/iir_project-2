@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>生醫資訊擷取技術 Project 2 結果</title>
+    <style>
+        .chart-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .chart {
+            position: relative;
+        }
+        .top-words {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: darkred; /* 暗紅色 */
+        }
+        .word-info {
+            font-size: 1.5em; /* 增加字體大小 */
+            color: darkgreen; /* 深綠色 */
+        }
+    </style>
+</head>
+<body>
+    <h1>詞幹提取結果</h1>
+    {% for result in file_results %}
+        <h2>檔案：{{ result.filename }}</h2>
+        
+        <div class="chart-container">
+            <div class="chart">
+                <h3>Porter Algorithm Frequency Distribution Chart</h3>
+                <div class="top-words">Top 6 Words: {{ result.top_words | join(', ') }}</div>
+                <img src="{{ url_for('static', filename='uploads/' + result.porter_plot) }}" alt="Porter Distribution" id="porter-chart" data-words="{{ result.words }}">
+                <div id="porter-info" class="word-info"></div>
+            </div>
+            <div class="chart">
+                <h3>Lancaster Algorithm Frequency Distribution Chart</h3>
+                <div class="top-words">Top 10 Words: {{ result.top_words | join(', ') }}</div>
+                <img src="{{ url_for('static', filename='uploads/' + result.lancaster_plot) }}" alt="Lancaster Distribution" id="lancaster-chart" data-words="{{ result.words }}">
+                <div id="lancaster-info" class="word-info"></div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        document.querySelectorAll('.chart img').forEach(chart => {
+            chart.addEventListener('mousemove', function(e) {
+                const words = this.dataset.words.split(',');
+                const index = Math.floor(e.offsetX / (this.width / words.length));
+                if (index >= 10 && index < words.length) { // 只顯示第11高及以後的字詞
+                    const infoDiv = this.nextElementSibling;
+                    infoDiv.textContent = 'Word: ' + words[index];
+                } else {
+                    this.nextElementSibling.textContent = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
