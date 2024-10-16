@@ -30,7 +30,7 @@
         <div class="chart-container">
             <div class="chart">
                 <h3>Porter Algorithm Frequency Distribution Chart</h3>
-                <div class="top-words">Top 6 Words: {{ result.top_words | join(', ') }}</div>
+                <div class="top-words">Top 10 Words: {{ result.top_words | join(', ') }}</div>
                 <img src="{{ url_for('static', filename='uploads/' + result.porter_plot) }}" alt="Porter Distribution" id="porter-chart" data-words="{{ result.words }}">
                 <div id="porter-info" class="word-info"></div>
             </div>
