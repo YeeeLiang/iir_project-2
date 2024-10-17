@@ -20,6 +20,15 @@
             font-size: 1.5em; /* 增加字體大小 */
             color: darkgreen; /* 深綠色 */
         }
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid darkgreen;
+            padding: 5px;
+            border-radius: 3px;
+            pointer-events: none; /* Prevent tooltip from interfering with mouse events */
+            display: none; /* Initially hidden */
+        }
     </style>
 </head>
 <body>
@@ -42,18 +51,40 @@
             </div>
         </div>
     {% endfor %}
+    
+    <div id="tooltip" class="tooltip"></div>
 
     <script>
-        document.querySelectorAll('.chart img').forEach(chart => {
-            chart.addEventListener('mousemove', function(e) {
-                const words = this.dataset.words.split(',');
-                const index = Math.floor(e.offsetX / (this.width / words.length));
-                if (index >= 10 && index < words.length) { // 只顯示第11高及以後的字詞
-                    const infoDiv = this.nextElementSibling;
-                    infoDiv.textContent = 'Word: ' + words[index];
-                } else {
-                    this.nextElementSibling.textContent = '';
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            const tooltip = document.getElementById('tooltip');
+
+            document.querySelectorAll('.chart img').forEach(chart => {
+                chart.addEventListener('mousemove', function(e) {
+                    const words = this.dataset.words.split(',').map(word => {
+                        const parts = word.split(':');
+                        return { word: parts[0], freq: parseInt(parts[1]) || 0 };
+                    }).sort((a, b) => b.freq - a.freq); // Sort by frequency descending
+
+                    // Calculate the index based on mouse position
+                    const index = Math.floor(e.offsetX / (this.width / words.length));
+
+                    // Check if the index is within the bounds of the words array
+                    if (index >= 0 && index < words.length) {
+                        const selectedWord = words[index];
+                        tooltip.textContent = `Word: ${selectedWord.word}, Frequency: ${selectedWord.freq}`;
+                        
+                        // Position the tooltip near the cursor
+                        tooltip.style.left = `${e.pageX + 10}px`;
+                        tooltip.style.top = `${e.pageY + 10}px`;
+                        tooltip.style.display = 'block'; // Show tooltip
+                    } else {
+                        tooltip.style.display = 'none'; // Hide tooltip if out of bounds
+                    }
+                });
+
+                chart.addEventListener('mouseout', function() {
+                    tooltip.style.display = 'none'; // Hide tooltip on mouse out
+                });
             });
         });
     </script>
