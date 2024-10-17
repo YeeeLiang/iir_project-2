@@ -47,13 +47,15 @@ def upload_files():
             freq_dist[word] = freq_dist.get(word, 0) + 1
 
         sorted_freq_dist = dict(sorted(freq_dist.items(), key=lambda item: item[1], reverse=True))
-        top_words = list(sorted_freq_dist.keys())[:10]
+        top_words = list(sorted_freq_dist.keys())[:10]  # 只取前 10 個字
+
+        words_freq_data = ', '.join(f"{word}:{freq}" for word, freq in sorted_freq_dist.items())
 
         file_results.append({
             'filename': file.filename,
             'porter_plot': porter_plot_path,
             'lancaster_plot': lancaster_plot_path,
-            'words': ', '.join(lemmatized_tokens),
+            'words': words_freq_data,
             'top_words': top_words
         })
 
